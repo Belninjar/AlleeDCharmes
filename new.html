@@ -45,56 +45,60 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* -------- utilitaire : nettoie le nom de fichier -------- */
+/* --- utilitaire : nettoie le nom de fichier --- */
 function slugify(filename) {
   return filename
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')   // enlève accents
-    .replace(/[^a-zA-Z0-9._-]/g, '-')                  // remplace espaces & co
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')   // supprime accents
+    .replace(/[^a-zA-Z0-9._-]/g, '-')                  // remplace espaces & co.
     .toLowerCase();
 }
 
-/* -------- assure qu’un utilisateur est connecté -------- */
+/* --- assure qu’un utilisateur est connecté --- */
 async function requireAuth() {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) window.location.href = 'login.html';
-  return session;
+  return session.user;
 }
-const session = await requireAuth();
-const user    = session.user;                          // objet user complet
+const user = await requireAuth();                      // objet User complet
 
-/* -------- formulaire : création de l’objet -------- */
 document.getElementById('newForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const cat   = document.getElementById('category').value;
-  const title = document.getElementById('title').value.trim();
-  const desc  = document.getElementById('description').value.trim();
+  const category   = document.getElementById('category').value;
+  const title      = document.getElementById('title').value.trim();
+  const description= document.getElementById('description').value.trim();
 
-  /* --- photo : upload dans le bucket 'pret' ou 'dons' --- */
+  /* --- récupère villa / username dans les métadonnées --- */
+  const villa    = user.user_metadata?.villa    ?? null;
+  const username = user.user_metadata?.username ?? null;
+
+  /* --- upload éventuel de la photo --- */
   let imageUrl = null;
   const fileInput = document.getElementById('photo');
-  if (fileInput.files[0]) {
+  if (fileInput.files.length) {
     const file     = fileInput.files[0];
     const filePath = `${Date.now()}_${slugify(file.name)}`;
-    const { error: uploadError } =
-      await supabase.storage.from(cat).upload(filePath, file, { upsert: false });
-    if (uploadError) return showError(uploadError.message);
+    const { error: uploadError } = await supabase
+      .storage
+      .from(category)              // bucket “pret” ou “dons”
+      .upload(filePath, file, { upsert: false });
 
-    imageUrl = supabase.storage.from(cat).getPublicUrl(filePath).data.publicUrl;
+    if (uploadError) { return showError(uploadError.message); }
+
+    imageUrl = supabase
+      .storage
+      .from(category)
+      .getPublicUrl(filePath).data.publicUrl;
   }
 
-  /* --- villa & pseudo depuis les métadonnées --- */
-  const villa    = user.user_metadata?.villa;
-  const username = user.user_metadata?.username;
-
-  /* --- insertion dans la table 'items' --- */
+  /* --- insertion dans la table items --- */
   const { error } = await supabase.from('items').insert([{
-    category:    cat,
-    title:       title,
-    description: desc,
-    image_url:   imageUrl,
-    villa:       villa,
-    username:    username
+    category,
+    title,
+    description,
+    image_url : imageUrl,
+    villa,
+    username
     // owner_id est rempli automatiquement par DEFAULT auth.uid()
   }]);
 
@@ -105,7 +109,7 @@ document.getElementById('newForm').addEventListener('submit', async (e) => {
   }
 });
 
-/* -------- helper d’affichage d’erreur -------- */
+/* -------- utilitaire d’erreur -------- */
 function showError(msg) {
   const el = document.getElementById('error');
   el.textContent = msg;
