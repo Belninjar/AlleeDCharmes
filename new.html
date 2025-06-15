@@ -37,7 +37,12 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+function slugify(filename) {
+    return filename
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // enlève accents
+      .replace(/[^a-zA-Z0-9._-]/g, '-')                // remplace espaces & co
+      .toLowerCase();
+  }
 async function requireAuth() {
   const { data: { session }} = await supabase.auth.getSession();
   if (!session) window.location.href = 'login.html';
@@ -55,7 +60,7 @@ document.getElementById('newForm').addEventListener('submit', async (e)=>{
   let imageUrl = null;
   if (fileInput.files[0]) {
     const file = fileInput.files[0];
-    const filePath = `${Date.now()}_${file.name}`;
+    const filePath = `${Date.now()}_${slugify(file.name)}`;
     const { error: uploadError } = await supabase.storage.from(cat).upload(filePath, file, { upsert:false });
     if (uploadError) {
       showError(uploadError.message);
