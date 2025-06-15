@@ -7,7 +7,9 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="container py-4">
+
 <h2 class="mb-3">Ajouter un objet</h2>
+
 <form id="newForm" class="mb-4">
   <div class="mb-3">
     <label class="form-label">Catégorie</label>
@@ -16,72 +18,94 @@
       <option value="dons">Dons</option>
     </select>
   </div>
+
   <div class="mb-3">
     <label class="form-label">Titre</label>
     <input type="text" class="form-control" id="title" required>
   </div>
+
   <div class="mb-3">
     <label class="form-label">Description</label>
     <textarea class="form-control" id="description" rows="3"></textarea>
   </div>
+
   <div class="mb-3">
     <label class="form-label">Photo (optionnel)</label>
     <input type="file" class="form-control" id="photo" accept="image/*">
   </div>
+
   <button class="btn btn-primary">Enregistrer</button>
   <a href="index.html" class="btn btn-link">Annuler</a>
-  <p class="small text-danger mt-2 d-none" id="error"></p>
+  <p id="error" class="small text-danger mt-2 d-none"></p>
 </form>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* -------- utilitaire : nettoie le nom de fichier -------- */
 function slugify(filename) {
-    return filename
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // enlève accents
-      .replace(/[^a-zA-Z0-9._-]/g, '-')                // remplace espaces & co
-      .toLowerCase();
-  }
+  return filename
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')   // enlève accents
+    .replace(/[^a-zA-Z0-9._-]/g, '-')                  // remplace espaces & co
+    .toLowerCase();
+}
+
+/* -------- assure qu’un utilisateur est connecté -------- */
 async function requireAuth() {
-  const { data: { session }} = await supabase.auth.getSession();
+  const { data: { session } } = await supabase.auth.getSession();
   if (!session) window.location.href = 'login.html';
   return session;
 }
 const session = await requireAuth();
-const userId = session.user.id;
+const user    = session.user;                          // objet user complet
 
-document.getElementById('newForm').addEventListener('submit', async (e)=>{
+/* -------- formulaire : création de l’objet -------- */
+document.getElementById('newForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const cat = document.getElementById('category').value;
-  const title = document.getElementById('title').value;
-  const desc = document.getElementById('description').value;
-  const fileInput = document.getElementById('photo');
+
+  const cat   = document.getElementById('category').value;
+  const title = document.getElementById('title').value.trim();
+  const desc  = document.getElementById('description').value.trim();
+
+  /* --- photo : upload dans le bucket 'pret' ou 'dons' --- */
   let imageUrl = null;
+  const fileInput = document.getElementById('photo');
   if (fileInput.files[0]) {
-    const file = fileInput.files[0];
+    const file     = fileInput.files[0];
     const filePath = `${Date.now()}_${slugify(file.name)}`;
-    const { error: uploadError } = await supabase.storage.from(cat).upload(filePath, file, { upsert:false });
-    if (uploadError) {
-      showError(uploadError.message);
-      return;
-    }
+    const { error: uploadError } =
+      await supabase.storage.from(cat).upload(filePath, file, { upsert: false });
+    if (uploadError) return showError(uploadError.message);
+
     imageUrl = supabase.storage.from(cat).getPublicUrl(filePath).data.publicUrl;
   }
-  const { error } = await supabase.from('items').insert({
-    category: cat,
-    title,
+
+  /* --- villa & pseudo depuis les métadonnées --- */
+  const villa    = user.user_metadata?.villa;
+  const username = user.user_metadata?.username;
+
+  /* --- insertion dans la table 'items' --- */
+  const { error } = await supabase.from('items').insert([{
+    category:    cat,
+    title:       title,
     description: desc,
-    image_url: imageUrl,
-    owner_id: userId
-  });
+    image_url:   imageUrl,
+    villa:       villa,
+    username:    username
+    // owner_id est rempli automatiquement par DEFAULT auth.uid()
+  }]);
+
   if (error) {
     showError(error.message);
   } else {
-    window.location.href='index.html';
+    window.location.href = 'index.html';
   }
 });
 
+/* -------- helper d’affichage d’erreur -------- */
 function showError(msg) {
   const el = document.getElementById('error');
   el.textContent = msg;
