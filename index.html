@@ -7,27 +7,21 @@
 
   <!-- Bootstrap core -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <!-- Masonry for Pinterest-like grid -->
+  <!-- Masonry -->
   <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
-  <!-- Bootstrap Icons for category pictos -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
   <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" />
 
   <style>
-    :root {
-      --primary: #2563eb;
-      --don-color: #10b981;
-      --pret-color: #2563eb;
-    }
+    :root { --primary:#2563eb; }
     body{font-family:"Poppins",sans-serif;background:#f8fafc;min-height:100vh;display:flex;flex-direction:column;}
-    .navbar-brand{font-weight:600;letter-spacing:-0.5px;}
+    .navbar-brand{font-weight:600;}
     .hero{background:linear-gradient(135deg,var(--primary),#4f46e5);color:#fff;padding:4rem 0 3rem;border-bottom-left-radius:2rem;border-bottom-right-radius:2rem;box-shadow:0 8px 24px rgba(0,0,0,.1);}
-    .item-card{border-radius:1rem;overflow:hidden;transition:transform .18s ease,box-shadow .18s ease;box-shadow:0 2px 6px rgba(0,0,0,.05);}    
+    .item-card{border-radius:1rem;overflow:hidden;transition:transform .18s,box-shadow .18s;box-shadow:0 2px 6px rgba(0,0,0,.05);}    
     .item-card:hover{transform:translateY(-4px) scale(1.015);box-shadow:0 8px 24px rgba(0,0,0,.1);}    
     .item-img{width:100%;height:200px;object-fit:cover;}
     .badge-pos{position:absolute;top:.75rem;left:.75rem;}
-    .cat-icon{font-size:1.25rem;margin-right:.25rem;}
+    .cat-emoji{font-size:1.25rem;margin-right:.35rem;vertical-align:-2px;}
     .masonry{margin:-1rem;}
     .masonry-item{padding:1rem;}
     footer{margin-top:auto;background:#eef2ff;padding:.75rem 0;font-size:.875rem;}
@@ -35,21 +29,19 @@
 </head>
 <body>
 
-<!-- NAV -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">Le Patio&nbsp;des&nbsp;Objets</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navBar" aria-controls="navBar" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navBar"><span class="navbar-toggler-icon"></span></button>
     <div class="collapse navbar-collapse" id="navBar">
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-lg-2">
-        <li class="nav-item"><button id="addBtn" class="btn btn-success w-100">Nouvel&nbsp;objet</button></li>
-        <li class="nav-item"><button id="logoutBtn" class="btn btn-outline-light w-100">Déconnexion</button></li>
+      <ul class="navbar-nav ms-auto gap-lg-2">
+        <li class="nav-item"><button id="addBtn" class="btn btn-success">Nouvel&nbsp;objet</button></li>
+        <li class="nav-item"><button id="logoutBtn" class="btn btn-outline-light">Déconnexion</button></li>
       </ul>
     </div>
   </div>
 </nav>
 
-<!-- HERO -->
 <header class="hero text-center">
   <div class="container">
     <h1 class="display-5 fw-bold mb-2">Prêtons, donnons, réduisons le gâchis</h1>
@@ -58,22 +50,18 @@
 </header>
 
 <main class="container py-5">
-  <!-- Search & Filters -->
   <div class="row g-3 align-items-center mb-4">
     <div class="col-12 col-lg-4 order-lg-2 text-lg-end">
-      <!-- Prêt / Don filter -->
-      <div class="btn-group shadow-sm" role="group">
+      <div class="btn-group" role="group">
         <button class="btn btn-outline-primary active" data-type="all">Tous</button>
         <button class="btn btn-outline-primary" data-type="pret">Prêt</button>
         <button class="btn btn-outline-primary" data-type="dons">Dons</button>
       </div>
     </div>
-
     <div class="col-12 col-lg-8 order-lg-1">
       <div class="row g-2">
         <div class="col-12 col-md-6">
-          <!-- Category dropdown -->
-          <select id="categoryFilter" class="form-select shadow-sm">
+          <select id="categoryFilter" class="form-select">
             <option value="all">Toutes les catégories</option>
             <option value="jardin">Jardin</option>
             <option value="bricolage">Bricolage</option>
@@ -87,8 +75,8 @@
           </select>
         </div>
         <div class="col-12 col-md-6">
-          <div class="input-group shadow-sm">
-            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+          <div class="input-group">
+            <span class="input-group-text bg-white">🔍</span>
             <input id="searchBox" type="search" class="form-control" placeholder="Rechercher…" />
             <button id="clearSearch" class="btn btn-outline-secondary">&times;</button>
           </div>
@@ -97,7 +85,6 @@
     </div>
   </div>
 
-  <!-- Grid -->
   <div id="items" class="row masonry"></div>
 </main>
 
@@ -110,57 +97,45 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* icons mapping */
-const ICONS = {
-  jardin: 'bi-flower3',
-  bricolage: 'bi-hammer',
-  maison: 'bi-house',
-  cuisine: 'bi-egg-fried',
-  jeux: 'bi-controller',
-  habits: 'bi-bag-fill',
-  manger: 'bi-cup-straw',
-  enfants: 'bi-bicycle',
-  divers: 'bi-box-seam'
+const ICONS={
+  jardin:'🌸',
+  bricolage:'🔨',
+  maison:'🏠',
+  cuisine:'🍴',
+  jeux:'🎮',
+  habits:'👕',
+  manger:'🍎',
+  enfants:'🚲',
+  divers:'📦'
 };
 
-/* auth */
-const { data: { session } } = await supabase.auth.getSession();
-if (!session) window.location.href = 'login.html';
-const user = session.user;
+const { data:{ session }} = await supabase.auth.getSession();
+if(!session) location='login.html';
+const user=session.user;
 
-/* nav buttons */
-document.getElementById('logoutBtn').addEventListener('click', async()=>{await supabase.auth.signOut();location='login.html';});
+document.getElementById('logoutBtn').addEventListener('click',async()=>{await supabase.auth.signOut();location='login.html';});
 
 document.getElementById('addBtn').addEventListener('click',()=>location='new.html');
 
-/* state */
-let typeFilter='all';
-let categoryFilter='all';
-let textQuery='';
+let typeFilter='all',categoryFilter='all',textQuery='';
 
-/* filter listeners */
-// type
 document.querySelectorAll('[data-type]').forEach(btn=>btn.addEventListener('click',()=>{
   document.querySelectorAll('[data-type]').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   typeFilter=btn.dataset.type;
   loadItems();
 }));
-// category
-const catSelect=document.getElementById('categoryFilter');
-catSelect.addEventListener('change',()=>{categoryFilter=catSelect.value;loadItems();});
-// search
-const searchBox=document.getElementById('searchBox');
-searchBox.addEventListener('input',e=>{textQuery=e.target.value.trim();loadItems();});
 
-document.getElementById('clearSearch').addEventListener('click',()=>{searchBox.value='';textQuery='';loadItems();});
+document.getElementById('categoryFilter').addEventListener('change',e=>{categoryFilter=e.target.value;loadItems();});
 
-/* Masonry */
+document.getElementById('searchBox').addEventListener('input',e=>{textQuery=e.target.value.trim();loadItems();});
+
+document.getElementById('clearSearch').addEventListener('click',()=>{document.getElementById('searchBox').value='';textQuery='';loadItems();});
+
 let masonry;
-
 async function loadItems(){
   let q=supabase.from('items').select('*').order('inserted_at',{ascending:false});
-  if(typeFilter!=='all') q=q.eq('category_type',typeFilter); // 'pret' vs 'dons'
+  if(typeFilter!=='all') q=q.eq('category_type',typeFilter);
   if(categoryFilter!=='all') q=q.eq('item_category',categoryFilter);
   if(textQuery) q=q.ilike('title',`%${textQuery}%`);
   const { data,error }=await q;
@@ -173,25 +148,10 @@ async function loadItems(){
     col.className='col-12 col-sm-6 col-lg-4 col-xl-3 masonry-item';
     const badgeColor=item.category_type==='pret'?'primary':'success';
     const badgeLabel=item.category_type==='pret'?'Prêt':'Don';
-    const ico=ICONS[item.item_category]||'bi-box';
-    const catLabel=item.item_category.charAt(0).toUpperCase()+item.item_category.slice(1);
+    const emoji=ICONS[item.item_category]||'📦';
     col.innerHTML=`<div class='card item-card position-relative'>
-      ${item.image_url?`<img src='${item.image_url}' alt='${item.title}' class='item-img'>`:''}
+      ${item.image_url?`<img src='${item.image_url}' class='item-img' alt='${item.title}'>`:''}
       <span class='badge bg-${badgeColor} badge-pos'>${badgeLabel}</span>
       <div class='card-body d-flex flex-column'>
-        <h6 class='fw-semibold mb-1'><i class='bi ${ico} cat-icon'></i>${item.title}</h6>
-        <p class='text-muted small mb-1'>Villa ${item.villa??'?'} – ${item.username??'Anonyme'}</p>
-        <p class='small flex-grow-1'>${item.description??''}</p>
-        ${canEdit?`<a href='edit.html?id=${item.id}' class='btn btn-outline-primary btn-sm mt-auto'>Modifier</a>`:''}
-      </div>
-    </div>`;
-    container.appendChild(col);
-  });
-  masonry?.destroy?.();
-  masonry=new Masonry(container,{itemSelector:'.masonry-item',percentPosition:true});
-}
-
-loadItems();
-</script>
-</body>
-</html>
+        <h6 class='fw-semibold mb-1'><span class='cat-emoji'>${emoji}</span>${item.title}</h6>
+        <p class='text-muted small mb-1'>Villa ${item.villa??
