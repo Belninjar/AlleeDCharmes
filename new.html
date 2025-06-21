@@ -5,111 +5,124 @@
   <title>Ajouter un objet</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body class="container py-4">
 
-<h2 class="mb-3">Ajouter un objet</h2>
+<h2 class="mb-4 fw-semibold"><i class="bi bi-plus-circle me-1"></i>Nouvel objet</h2>
 
-<form id="newForm" class="mb-4">
-  <div class="mb-3">
-    <label class="form-label">Catégorie</label>
-    <select id="category" class="form-select" required>
-      <option value="pret">Prêt</option>
-      <option value="dons">Dons</option>
+<form id="newForm" class="vstack gap-3">
+
+  <!-- Type prêt / don -->
+  <div>
+    <label class="form-label">Objet proposé&nbsp;:</label>
+    <select id="type" class="form-select" required>
+      <option value="pret">À prêter</option>
+      <option value="dons">À donner</option>
     </select>
   </div>
 
-  <div class="mb-3">
+  <!-- Catégorie -->
+  <div>
+    <label class="form-label">Catégorie</label>
+    <select id="itemCategory" class="form-select" required>
+      <option value="jardin">Jardin</option>
+      <option value="bricolage">Bricolage</option>
+      <option value="maison">Maison</option>
+      <option value="cuisine">Cuisine</option>
+      <option value="jeux">Jeux/Jouets</option>
+      <option value="habits">Habits</option>
+      <option value="manger">À manger</option>
+      <option value="enfants">Enfants</option>
+      <option value="divers">Divers</option>
+    </select>
+  </div>
+
+  <!-- Titre -->
+  <div>
     <label class="form-label">Titre</label>
-    <input type="text" class="form-control" id="title" required>
+    <input type="text" id="title" class="form-control" required>
   </div>
 
-  <div class="mb-3">
+  <!-- Description -->
+  <div>
     <label class="form-label">Description</label>
-    <textarea class="form-control" id="description" rows="3"></textarea>
+    <textarea id="description" class="form-control" rows="3"></textarea>
   </div>
 
-  <div class="mb-3">
+  <!-- Photo -->
+  <div>
     <label class="form-label">Photo (optionnel)</label>
-    <input type="file" class="form-control" id="photo" accept="image/*">
+    <input type="file" id="photo" class="form-control" accept="image/*">
   </div>
 
-  <button class="btn btn-primary">Enregistrer</button>
-  <a href="index.html" class="btn btn-link">Annuler</a>
-  <p id="error" class="small text-danger mt-2 d-none"></p>
+  <div class="d-flex gap-2">
+    <button class="btn btn-primary">Enregistrer</button>
+    <a href="index.html" class="btn btn-link">Annuler</a>
+  </div>
+
+  <p id="error" class="small text-danger d-none"></p>
 </form>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
-
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* --- utilitaire : nettoie le nom de fichier --- */
+/* utilitaire : nettoie le nom de fichier */
 function slugify(filename) {
   return filename
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')   // supprime accents
-    .replace(/[^a-zA-Z0-9._-]/g, '-')                  // remplace espaces & co.
+    .normalize('NFD').replace(/[\\u0300-\\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9._-]/g, '-')
     .toLowerCase();
 }
 
-/* --- assure qu’un utilisateur est connecté --- */
-async function requireAuth() {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) window.location.href = 'login.html';
-  return session.user;
-}
-const user = await requireAuth();                      // objet User complet
+/* Auth obligatoire */
+const { data: { session } } = await supabase.auth.getSession();
+if (!session) location = 'login.html';
+const user = session.user;
 
+/* Soumission */
 document.getElementById('newForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const category   = document.getElementById('category').value;
-  const title      = document.getElementById('title').value.trim();
-  const description= document.getElementById('description').value.trim();
+  const category_type = document.getElementById('type').value;      // pret / dons
+  const item_category = document.getElementById('itemCategory').value;
+  const title         = document.getElementById('title').value.trim();
+  const description   = document.getElementById('description').value.trim();
 
-  /* --- récupère villa / username dans les métadonnées --- */
-  const villa    = user.user_metadata?.villa    ?? null;
-  const username = user.user_metadata?.username ?? null;
+  /* Récupère villa / username depuis les métadonnées */
+  const villa    = user.user_metadata?.villa;
+  const username = user.user_metadata?.username;
 
-  /* --- upload éventuel de la photo --- */
-  let imageUrl = null;
-  const fileInput = document.getElementById('photo');
-  if (fileInput.files.length) {
-    const file     = fileInput.files[0];
+  let image_url = null;
+  const file = document.getElementById('photo').files[0];
+  if (file) {
     const filePath = `${Date.now()}_${slugify(file.name)}`;
-    const { error: uploadError } = await supabase
-      .storage
-      .from(category)              // bucket “pret” ou “dons”
-      .upload(filePath, file, { upsert: false });
+    const { error: upErr } = await supabase
+      .storage.from(category_type)          // bucket pret / dons
+      .upload(filePath, file);
 
-    if (uploadError) { return showError(uploadError.message); }
-
-    imageUrl = supabase
-      .storage
-      .from(category)
-      .getPublicUrl(filePath).data.publicUrl;
+    if (upErr) return showError(upErr.message);
+    image_url = supabase.storage.from(category_type).getPublicUrl(filePath).data.publicUrl;
   }
 
-  /* --- insertion dans la table items --- */
   const { error } = await supabase.from('items').insert([{
-    category,
+    category_type,
+    item_category,
     title,
     description,
-    image_url : imageUrl,
+    image_url,
     villa,
     username
-    // owner_id est rempli automatiquement par DEFAULT auth.uid()
+    // owner_id rempli auto (DEFAULT auth.uid())
   }]);
 
-  if (error) {
-    showError(error.message);
-  } else {
-    window.location.href = 'index.html';
-  }
+  if (error) showError(error.message);
+  else location = 'index.html';
 });
 
-/* -------- utilitaire d’erreur -------- */
+/* erreur */
 function showError(msg) {
   const el = document.getElementById('error');
   el.textContent = msg;
