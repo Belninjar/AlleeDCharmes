@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <title>Le Patio des Objets – Partage & Dons</title>
+  <title>Les Garages en bordel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Bootstrap + Masonry -->
@@ -31,7 +31,7 @@
 <!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Le Patio&nbsp;des&nbsp;Objets</a>
+    <a class="navbar-brand" href="#">Les Garages&nbsp;en&nbsp;Bordel</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navBar">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -47,8 +47,8 @@
 <!-- HERO -->
 <header class="hero text-center">
   <div class="container">
-    <h1 class="display-5 fw-bold mb-2">Prêtons, donnons, réduisons le gâchis</h1>
-    <p class="lead mb-0">Espace réservé aux 12 villas : trouvez l’objet qu’il vous faut&nbsp;!</p>
+    <h1 class="display-5 fw-bold mb-2">On prête, On donne</h1>
+    <p class="lead mb-0">Un espace entre nous pour se prêter ou se donner nos objets&nbsp;!</p>
   </div>
 </header>
 
@@ -101,9 +101,8 @@
   </div>
 </div>
 
-<footer class="text-center text-muted">&copy; 2025 – Le Patio des Objets</footer>
+<footer class="text-center text-muted">&copy; 2025 – Les Garages en Bordel - Guillaume</footer>
 
-<!-- SCRIPT -->
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
@@ -122,69 +121,76 @@ const user = session.user;
 logoutBtn.onclick = async()=>{ await supabase.auth.signOut(); location='login.html'; };
 addBtn.onclick = quickAddBtn.onclick = ()=> location='new.html';
 
-/* Filtres */
-let typeFilter='all', categoryFilter='all', textQuery='';
+/* Filtres (états) */
+let typeFilter   = 'all';
+let categoryState= 'all';
+let textQuery    = '';
+
 document.querySelectorAll('[data-type]').forEach(btn=>{
-  btn.onclick=()=>{
+  btn.onclick = () => {
     document.querySelectorAll('[data-type]').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active'); typeFilter=btn.dataset.type; loadItems();
+    btn.classList.add('active');
+    typeFilter = btn.dataset.type;
+    loadItems();
   };
 });
-categoryFilter.onchange = e=>{ categoryFilter=e.target.value; loadItems(); };
-searchBox.oninput = e=>{ textQuery=e.target.value.trim(); loadItems(); };
-clearSearch.onclick = ()=>{ searchBox.value=''; textQuery=''; loadItems(); };
+
+const categorySelect = document.getElementById('categoryFilter');
+categorySelect.onchange = e => { categoryState = e.target.value; loadItems(); };
+
+searchBox.oninput = e => { textQuery = e.target.value.trim(); loadItems(); };
+clearSearch.onclick = () => { searchBox.value=''; textQuery=''; loadItems(); };
 
 /* Masonry */
 let masonry;
 async function loadItems(){
   let q = supabase.from('items').select('*').order('inserted_at',{ascending:false});
-  if (typeFilter!=='all')   q = q.eq('category_type',typeFilter);
-  if (categoryFilter!=='all') q = q.eq('item_category',categoryFilter);
-  if (textQuery)             q = q.ilike('title',`%${textQuery}%`);
+  if (typeFilter   !== 'all') q = q.eq('category_type', typeFilter);
+  if (categoryState!== 'all') q = q.eq('item_category', categoryState);
+  if (textQuery)             q = q.ilike('title', `%${textQuery}%`);
 
   const { data, error } = await q;
   const container = document.getElementById('items');
-  container.innerHTML='';
-  if (error){ container.innerHTML=`<p class='text-danger'>${error.message}</p>`; return; }
+  container.innerHTML = '';
+  if (error){ container.innerHTML = `<p class='text-danger'>${error.message}</p>`; return; }
 
   data.forEach(item=>{
     const canEdit = user.id===item.owner_id || user.user_metadata?.is_admin;
     const col = document.createElement('div');
-    col.className='col-12 col-sm-6 col-lg-4 col-xl-3 masonry-item';
-    const badgeColor = item.category_type==='pret' ? 'primary' : 'success';
-    const emoji = ICONS[item.item_category] || '📦';
+    col.className = 'col-12 col-sm-6 col-lg-4 col-xl-3 masonry-item';
+
     col.innerHTML = `
       <div class='card item-card position-relative'>
-        ${item.image_url?
-          `<img src='${item.image_url}' class='item-img' alt='${item.title}'>` : ''}
-        <span class='badge bg-${badgeColor} badge-pos'>
+        ${item.image_url ? `<img src='${item.image_url}' class='item-img' alt='${item.title}'>` : ''}
+        <span class='badge bg-${item.category_type==='pret'?'primary':'success'} badge-pos'>
           ${item.category_type==='pret'?'Prêt':'Don'}
         </span>
         <div class='card-body d-flex flex-column'>
-          <h6 class='fw-semibold mb-1'><span class='cat-emoji'>${emoji}</span>${item.title}</h6>
+          <h6 class='fw-semibold mb-1'><span class='cat-emoji'>${ICONS[item.item_category]||'📦'}</span>${item.title}</h6>
           <p class='text-muted small mb-1'>Villa ${item.villa??'?'} – ${item.username??'Anonyme'}</p>
           <p class='small flex-grow-1'>${item.description??''}</p>
-          ${canEdit?`<a href='edit.html?id=${item.id}' class='btn btn-outline-primary btn-sm mt-auto'>Modifier</a>`:''}
+          ${canEdit ? `<a href='edit.html?id=${item.id}' class='btn btn-outline-primary btn-sm mt-auto'>Modifier</a>` : ''}
         </div>
       </div>`;
     container.appendChild(col);
   });
 
-  /* (re)Init Masonry */
+  /* Masonry re-init */
   masonry?.destroy?.();
   masonry = new Masonry(container,{ itemSelector:'.masonry-item', percentPosition:true });
 
-  /* Clic image plein écran */
+  /* Click image => modal */
   container.addEventListener('click', e=>{
     const img = e.target.closest('.item-img');
-    if(!img) return;
-    modalImg.src = img.src;
-    bootstrap.Modal.getOrCreateInstance('#imgModal').show();
+    if(img){
+      modalImg.src = img.src;
+      bootstrap.Modal.getOrCreateInstance('#imgModal').show();
+    }
   });
 }
-modalImg.onclick = ()=> bootstrap.Modal.getInstance('#imgModal').hide();
+modalImg.onclick = () => bootstrap.Modal.getInstance('#imgModal').hide();
 
-/* première charge */
+/* initial load */
 loadItems();
 </script>
 </body>
