@@ -156,4 +156,19 @@ async function loadItems(){
       <span class='badge bg-${badgeColor} badge-pos'>${badgeLabel}</span>
       <div class='card-body d-flex flex-column'>
         <h6 class='fw-semibold mb-1'><span class='cat-emoji'>${emoji}</span>${item.title}</h6>
-        <p class='text-muted small mb-1'>Villa ${item.villa??
+        <p class='text-muted small mb-1'>Villa ${item.villa ?? '?'} – ${item.username ?? 'Anonyme'}</p>
+        <p class='small flex-grow-1'>${item.description ?? ''}</p>
+        ${canEdit ? `<a href='edit.html?id=${item.id}' class='btn btn-outline-primary btn-sm mt-auto'>Modifier</a>` : ''}
+      </div>
+    </div>`;
+    container.appendChild(col);
+  });
+  /* Masonry (re)init */
+  masonry?.destroy?.();
+  masonry = new Masonry(container,{ itemSelector: '.masonry-item', percentPosition:true });
+}
+
+loadItems();
+</script>
+</body>
+</html> ${item.villa??
