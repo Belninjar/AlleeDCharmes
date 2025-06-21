@@ -2,42 +2,35 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <title>Les Garages en Bordel – Partage & Dons</title>
+  <title>Le Patio des Objets – Partage & Dons</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Bootstrap core -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <!-- Masonry for Pinterest‑like grid -->
+  <!-- Masonry for Pinterest-like grid -->
   <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
-  <!-- Google Font for a friendly look -->
+  <!-- Bootstrap Icons for category pictos -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+  <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
 
   <style>
     :root {
-      --primary: #2563eb;  /* Tailwind indigo‑600 */
-      --don-color: #10b981;/* Tailwind emerald‑500 */
+      --primary: #2563eb;
+      --don-color: #10b981;
+      --pret-color: #2563eb;
     }
-
-    body {font-family: "Poppins", sans-serif;background:#f8fafc;min-height:100vh;display:flex;flex-direction:column;}
-
-    /* NAVBAR */
+    body{font-family:"Poppins",sans-serif;background:#f8fafc;min-height:100vh;display:flex;flex-direction:column;}
     .navbar-brand{font-weight:600;letter-spacing:-0.5px;}
-
-    /* HERO */
-    .hero{background:linear-gradient(135deg,var(--primary),#4f46e5);color:#fff;padding:4rem 0;border-bottom-left-radius:2rem;border-bottom-right-radius:2rem;box-shadow:0 8px 24px rgba(0,0,0,.1);}
-
-    /* CARD */
-    .item-card{border-radius:1rem;overflow:hidden;transition:transform .18s ease,box-shadow .18s ease;box-shadow:0 2px 6px rgba(0,0,0,.04);}
-    .item-card:hover{transform:translateY(-4px) scale(1.015);box-shadow:0 8px 24px rgba(0,0,0,.08);}
-    .item-img{width:100%;height:200px;object-fit:cover;display:block;}
+    .hero{background:linear-gradient(135deg,var(--primary),#4f46e5);color:#fff;padding:4rem 0 3rem;border-bottom-left-radius:2rem;border-bottom-right-radius:2rem;box-shadow:0 8px 24px rgba(0,0,0,.1);}
+    .item-card{border-radius:1rem;overflow:hidden;transition:transform .18s ease,box-shadow .18s ease;box-shadow:0 2px 6px rgba(0,0,0,.05);}    
+    .item-card:hover{transform:translateY(-4px) scale(1.015);box-shadow:0 8px 24px rgba(0,0,0,.1);}    
+    .item-img{width:100%;height:200px;object-fit:cover;}
     .badge-pos{position:absolute;top:.75rem;left:.75rem;}
-
-    /* Masonry column gap fix */
+    .cat-icon{font-size:1.25rem;margin-right:.25rem;}
     .masonry{margin:-1rem;}
     .masonry-item{padding:1rem;}
-
     footer{margin-top:auto;background:#eef2ff;padding:.75rem 0;font-size:.875rem;}
-
   </style>
 </head>
 <body>
@@ -45,7 +38,7 @@
 <!-- NAV -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Les Garages&nbsp;en&nbsp;Bordel</a>
+    <a class="navbar-brand" href="#">Le Patio&nbsp;des&nbsp;Objets</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navBar" aria-controls="navBar" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
     <div class="collapse navbar-collapse" id="navBar">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-lg-2">
@@ -59,129 +52,146 @@
 <!-- HERO -->
 <header class="hero text-center">
   <div class="container">
-    <h1 class="display-5 fw-bold mb-2">On Partage – On prête – On donne</h1>
-    <p class="lead mb-0">Un coin entre voisins pour tenter de vider nos garages et se prêter des trucs.</p>
+    <h1 class="display-5 fw-bold mb-2">Prêtons, donnons, réduisons le gâchis</h1>
+    <p class="lead mb-0">Espace réservé aux 12 villas : trouvez l’objet qu’il vous faut&nbsp;!</p>
   </div>
 </header>
 
 <main class="container py-5">
   <!-- Search & Filters -->
   <div class="row g-3 align-items-center mb-4">
-    <div class="col-12 col-lg-6">
-      <div class="input-group shadow-sm">
-        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-        <input id="searchBox" type="search" class="form-control" placeholder="Rechercher un objet…" />
-        <button id="clearSearch" class="btn btn-outline-secondary" title="Effacer">&times;</button>
+    <div class="col-12 col-lg-4 order-lg-2 text-lg-end">
+      <!-- Prêt / Don filter -->
+      <div class="btn-group shadow-sm" role="group">
+        <button class="btn btn-outline-primary active" data-type="all">Tous</button>
+        <button class="btn btn-outline-primary" data-type="pret">Prêt</button>
+        <button class="btn btn-outline-primary" data-type="dons">Dons</button>
       </div>
     </div>
-    <div class="col-12 col-lg-6 text-lg-end">
-      <div class="btn-group shadow-sm" role="group">
-        <button class="btn btn-outline-primary active" data-filter="all">Tous</button>
-        <button class="btn btn-outline-primary" data-filter="pret">Prêt</button>
-        <button class="btn btn-outline-primary" data-filter="dons">Dons</button>
+
+    <div class="col-12 col-lg-8 order-lg-1">
+      <div class="row g-2">
+        <div class="col-12 col-md-6">
+          <!-- Category dropdown -->
+          <select id="categoryFilter" class="form-select shadow-sm">
+            <option value="all">Toutes les catégories</option>
+            <option value="jardin">Jardin</option>
+            <option value="bricolage">Bricolage</option>
+            <option value="maison">Maison</option>
+            <option value="cuisine">Cuisine</option>
+            <option value="jeux">Jeux/Jouets</option>
+            <option value="habits">Habits</option>
+            <option value="manger">À manger</option>
+            <option value="enfants">Enfants</option>
+            <option value="divers">Divers</option>
+          </select>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="input-group shadow-sm">
+            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+            <input id="searchBox" type="search" class="form-control" placeholder="Rechercher…" />
+            <button id="clearSearch" class="btn btn-outline-secondary">&times;</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Masonry grid -->
+  <!-- Grid -->
   <div id="items" class="row masonry"></div>
 </main>
 
-<footer class="text-center text-muted">&copy;&nbsp;2025 – Les Garages en Bordel - Guillaume</footer>
+<footer class="text-center text-muted">&copy;&nbsp;2025 – Le Patio des Objets</footer>
 
-<!-- Bootstrap JS bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Bootstrap Icons for the search icon -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
 
 <script type="module">
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-  import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  /* -------- auth -------- */
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) window.location.href = 'login.html';
-  const user = session.user;
+/* icons mapping */
+const ICONS = {
+  jardin: 'bi-flower3',
+  bricolage: 'bi-hammer',
+  maison: 'bi-house',
+  cuisine: 'bi-egg-fried',
+  jeux: 'bi-controller',
+  habits: 'bi-bag-fill',
+  manger: 'bi-cup-straw',
+  enfants: 'bi-bicycle',
+  divers: 'bi-box-seam'
+};
 
-  /* Nav */
-  document.getElementById('logoutBtn').addEventListener('click', async () => {
-    await supabase.auth.signOut();
-    window.location.href = 'login.html';
-  });
-  document.getElementById('addBtn').addEventListener('click', () => {
-    window.location.href = 'new.html';
-  });
+/* auth */
+const { data: { session } } = await supabase.auth.getSession();
+if (!session) window.location.href = 'login.html';
+const user = session.user;
 
-  /* State */
-  let currentFilter = 'all';
-  let currentQuery = '';
+/* nav buttons */
+document.getElementById('logoutBtn').addEventListener('click', async()=>{await supabase.auth.signOut();location='login.html';});
 
-  /* Search */
-  document.getElementById('searchBox').addEventListener('input', (e) => {
-    currentQuery = e.target.value.trim();
-    loadItems();
-  });
-  document.getElementById('clearSearch').addEventListener('click', () => {
-    document.getElementById('searchBox').value = '';
-    currentQuery = '';
-    loadItems();
-  });
+document.getElementById('addBtn').addEventListener('click',()=>location='new.html');
 
-  /* Filters */
-  document.querySelectorAll('[data-filter]').forEach((btn) =>
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('[data-filter]').forEach((b) => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentFilter = btn.dataset.filter;
-      loadItems();
-    })
-  );
+/* state */
+let typeFilter='all';
+let categoryFilter='all';
+let textQuery='';
 
-  /* Masonry instance */
-  let masonry;
-
-  async function loadItems() {
-    let q = supabase.from('items').select('*').order('inserted_at', { ascending: false });
-    if (currentFilter !== 'all') q = q.eq('category', currentFilter);
-    if (currentQuery) q = q.ilike('title', `%${currentQuery}%`);
-
-    const { data, error } = await q;
-    const container = document.getElementById('items');
-    container.innerHTML = '';
-
-    if (error) {
-      container.innerHTML = `<p class="text-danger">${error.message}</p>`;
-      return;
-    }
-
-    data.forEach((item) => {
-      const canEdit = user.id === item.owner_id || user.user_metadata?.is_admin === true;
-      const badgeColor = item.category === 'pret' ? 'primary' : 'success';
-      const badgeLabel = item.category === 'pret' ? 'Prêt' : 'Don';
-
-      const col = document.createElement('div');
-      col.className = 'col-12 col-sm-6 col-lg-4 col-xl-3 masonry-item';
-      col.innerHTML = `
-        <div class="card item-card position-relative">
-          ${item.image_url ? `<img src="${item.image_url}" class="item-img" alt="${item.title}">` : ''}
-          <span class="badge bg-${badgeColor} badge-pos">${badgeLabel}</span>
-          <div class="card-body d-flex flex-column">
-            <h6 class="fw-semibold mb-1">${item.title}</h6>
-            <p class="text-muted small mb-1">Villa ${item.villa ?? '?'} – ${item.username ?? 'Anonyme'}</p>
-            <p class="small flex-grow-1">${item.description ?? ''}</p>
-            ${canEdit ? `<a href="edit.html?id=${item.id}" class="btn btn-outline-primary btn-sm mt-auto">Modifier</a>` : ''}
-          </div>
-        </div>`;
-      container.appendChild(col);
-    });
-
-    /* (Re)initialise Masonry */
-    masonry?.destroy?.();
-    masonry = new Masonry(container, { itemSelector: '.masonry-item', percentPosition: true });
-  }
-
+/* filter listeners */
+// type
+document.querySelectorAll('[data-type]').forEach(btn=>btn.addEventListener('click',()=>{
+  document.querySelectorAll('[data-type]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  typeFilter=btn.dataset.type;
   loadItems();
+}));
+// category
+const catSelect=document.getElementById('categoryFilter');
+catSelect.addEventListener('change',()=>{categoryFilter=catSelect.value;loadItems();});
+// search
+const searchBox=document.getElementById('searchBox');
+searchBox.addEventListener('input',e=>{textQuery=e.target.value.trim();loadItems();});
+
+document.getElementById('clearSearch').addEventListener('click',()=>{searchBox.value='';textQuery='';loadItems();});
+
+/* Masonry */
+let masonry;
+
+async function loadItems(){
+  let q=supabase.from('items').select('*').order('inserted_at',{ascending:false});
+  if(typeFilter!=='all') q=q.eq('category_type',typeFilter); // 'pret' vs 'dons'
+  if(categoryFilter!=='all') q=q.eq('item_category',categoryFilter);
+  if(textQuery) q=q.ilike('title',`%${textQuery}%`);
+  const { data,error }=await q;
+  const container=document.getElementById('items');
+  container.innerHTML='';
+  if(error){container.innerHTML=`<p class='text-danger'>${error.message}</p>`;return;}
+  data.forEach(item=>{
+    const canEdit=user.id===item.owner_id||user.user_metadata?.is_admin===true;
+    const col=document.createElement('div');
+    col.className='col-12 col-sm-6 col-lg-4 col-xl-3 masonry-item';
+    const badgeColor=item.category_type==='pret'?'primary':'success';
+    const badgeLabel=item.category_type==='pret'?'Prêt':'Don';
+    const ico=ICONS[item.item_category]||'bi-box';
+    const catLabel=item.item_category.charAt(0).toUpperCase()+item.item_category.slice(1);
+    col.innerHTML=`<div class='card item-card position-relative'>
+      ${item.image_url?`<img src='${item.image_url}' alt='${item.title}' class='item-img'>`:''}
+      <span class='badge bg-${badgeColor} badge-pos'>${badgeLabel}</span>
+      <div class='card-body d-flex flex-column'>
+        <h6 class='fw-semibold mb-1'><i class='bi ${ico} cat-icon'></i>${item.title}</h6>
+        <p class='text-muted small mb-1'>Villa ${item.villa??'?'} – ${item.username??'Anonyme'}</p>
+        <p class='small flex-grow-1'>${item.description??''}</p>
+        ${canEdit?`<a href='edit.html?id=${item.id}' class='btn btn-outline-primary btn-sm mt-auto'>Modifier</a>`:''}
+      </div>
+    </div>`;
+    container.appendChild(col);
+  });
+  masonry?.destroy?.();
+  masonry=new Masonry(container,{itemSelector:'.masonry-item',percentPosition:true});
+}
+
+loadItems();
 </script>
 </body>
 </html>
