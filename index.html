@@ -5,21 +5,21 @@
   <title>Le Patio des Objets – Partage & Dons</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Bootstrap core -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <!-- Masonry -->
+  <!-- Bootstrap + Masonry -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
-  <!-- Google Font -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
     :root { --primary:#2563eb; }
     body{font-family:"Poppins",sans-serif;background:#f8fafc;min-height:100vh;display:flex;flex-direction:column;}
     .navbar-brand{font-weight:600;}
     .hero{background:linear-gradient(135deg,var(--primary),#4f46e5);color:#fff;padding:4rem 0 3rem;border-bottom-left-radius:2rem;border-bottom-right-radius:2rem;box-shadow:0 8px 24px rgba(0,0,0,.1);}
-    .item-card{border-radius:1rem;overflow:hidden;transition:transform .18s,box-shadow .18s;box-shadow:0 2px 6px rgba(0,0,0,.05);}    
-    .item-card:hover{transform:translateY(-4px) scale(1.015);box-shadow:0 8px 24px rgba(0,0,0,.1);}    
-    .item-img{width:100%;height:200px;object-fit:cover;}
+    .item-card{border-radius:1rem;overflow:hidden;transition:transform .18s,box-shadow .18s;box-shadow:0 2px 6px rgba(0,0,0,.05);}
+    .item-card:hover{transform:translateY(-4px) scale(1.015);box-shadow:0 8px 24px rgba(0,0,0,.1);}
+    .item-img{width:100%;height:200px;object-fit:cover;cursor:pointer;}
     .badge-pos{position:absolute;top:.75rem;left:.75rem;}
     .cat-emoji{font-size:1.25rem;margin-right:.35rem;vertical-align:-2px;}
     .masonry{margin:-1rem;}
@@ -28,20 +28,23 @@
   </style>
 </head>
 <body>
-
+<!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">Le Patio&nbsp;des&nbsp;Objets</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navBar"><span class="navbar-toggler-icon"></span></button>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navBar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
     <div class="collapse navbar-collapse" id="navBar">
       <ul class="navbar-nav ms-auto gap-lg-2">
-        <li class="nav-item"><button id="addBtn" class="btn btn-success">Nouvel&nbsp;objet</button></li>
+        <li class="nav-item"><button id="addBtn"    class="btn btn-success">Nouvel&nbsp;objet</button></li>
         <li class="nav-item"><button id="logoutBtn" class="btn btn-outline-light">Déconnexion</button></li>
       </ul>
     </div>
   </div>
 </nav>
 
+<!-- HERO -->
 <header class="hero text-center">
   <div class="container">
     <h1 class="display-5 fw-bold mb-2">Prêtons, donnons, réduisons le gâchis</h1>
@@ -49,36 +52,35 @@
   </div>
 </header>
 
+<!-- MAIN -->
 <main class="container py-5">
+  <!-- Filtres -->
   <div class="row g-3 align-items-center mb-4">
     <div class="col-12 col-lg-4 order-lg-2 text-lg-end">
-      <div class="btn-group" role="group">
+      <div class="btn-group">
         <button class="btn btn-outline-primary active" data-type="all">Tous</button>
         <button class="btn btn-outline-primary" data-type="pret">Prêt</button>
         <button class="btn btn-outline-primary" data-type="dons">Dons</button>
         <button class="btn btn-success" id="quickAddBtn" title="Ajouter un objet">＋</button>
       </div>
     </div>
+
     <div class="col-12 col-lg-8 order-lg-1">
       <div class="row g-2">
         <div class="col-12 col-md-6">
           <select id="categoryFilter" class="form-select">
             <option value="all">Toutes les catégories</option>
-            <option value="jardin">Jardin</option>
-            <option value="bricolage">Bricolage</option>
-            <option value="maison">Maison</option>
-            <option value="cuisine">Cuisine</option>
-            <option value="jeux">Jeux/Jouets</option>
-            <option value="habits">Habits</option>
-            <option value="manger">À manger</option>
-            <option value="enfants">Enfants</option>
+            <option value="jardin">Jardin</option><option value="bricolage">Bricolage</option>
+            <option value="maison">Maison</option><option value="cuisine">Cuisine</option>
+            <option value="jeux">Jeux/Jouets</option><option value="habits">Habits</option>
+            <option value="manger">À manger</option><option value="enfants">Enfants</option>
             <option value="divers">Divers</option>
           </select>
         </div>
         <div class="col-12 col-md-6">
           <div class="input-group">
             <span class="input-group-text bg-white">🔍</span>
-            <input id="searchBox" type="search" class="form-control" placeholder="Rechercher…" />
+            <input id="searchBox" type="search" class="form-control" placeholder="Rechercher…">
             <button id="clearSearch" class="btn btn-outline-secondary">&times;</button>
           </div>
         </div>
@@ -86,89 +88,104 @@
     </div>
   </div>
 
+  <!-- Grille d'objets -->
   <div id="items" class="row masonry"></div>
 </main>
 
-<footer class="text-center text-muted">&copy;&nbsp;2025 – Le Patio des Objets</footer>
+<!-- MODAL image -->
+<div class="modal fade" id="imgModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content bg-transparent border-0">
+      <img id="modalImg" class="w-100 rounded-3 shadow" style="max-height:80vh;object-fit:contain;cursor:pointer;">
+    </div>
+  </div>
+</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<footer class="text-center text-muted">&copy; 2025 – Le Patio des Objets</footer>
 
+<!-- SCRIPT -->
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const ICONS={
-  jardin:'🌸',
-  bricolage:'🔨',
-  maison:'🏠',
-  cuisine:'🍴',
-  jeux:'🎮',
-  habits:'👕',
-  manger:'🍎',
-  enfants:'🚲',
-  divers:'📦'
-};
+/* Emojis par catégorie */
+const ICONS = { jardin:'🌸', bricolage:'🔨', maison:'🏠', cuisine:'🍴', jeux:'🎮',
+                habits:'👕', manger:'🍎', enfants:'🚲', divers:'📦' };
 
+/* Auth */
 const { data:{ session }} = await supabase.auth.getSession();
-if(!session) location='login.html';
-const user=session.user;
+if (!session) location = 'login.html';
+const user = session.user;
 
-document.getElementById('logoutBtn').addEventListener('click',async()=>{await supabase.auth.signOut();location='login.html';});
+/* Nav */
+logoutBtn.onclick = async()=>{ await supabase.auth.signOut(); location='login.html'; };
+addBtn.onclick = quickAddBtn.onclick = ()=> location='new.html';
 
-document.getElementById('addBtn').addEventListener('click',()=>location='new.html');
-document.getElementById('quickAddBtn').addEventListener('click',()=>location='new.html');
+/* Filtres */
+let typeFilter='all', categoryFilter='all', textQuery='';
+document.querySelectorAll('[data-type]').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('[data-type]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); typeFilter=btn.dataset.type; loadItems();
+  };
+});
+categoryFilter.onchange = e=>{ categoryFilter=e.target.value; loadItems(); };
+searchBox.oninput = e=>{ textQuery=e.target.value.trim(); loadItems(); };
+clearSearch.onclick = ()=>{ searchBox.value=''; textQuery=''; loadItems(); };
 
-let typeFilter='all',categoryFilter='all',textQuery='';
-
-document.querySelectorAll('[data-type]').forEach(btn=>btn.addEventListener('click',()=>{
-  document.querySelectorAll('[data-type]').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  typeFilter=btn.dataset.type;
-  loadItems();
-}));
-
-document.getElementById('categoryFilter').addEventListener('change',e=>{categoryFilter=e.target.value;loadItems();});
-
-document.getElementById('searchBox').addEventListener('input',e=>{textQuery=e.target.value.trim();loadItems();});
-
-document.getElementById('clearSearch').addEventListener('click',()=>{document.getElementById('searchBox').value='';textQuery='';loadItems();});
-
+/* Masonry */
 let masonry;
 async function loadItems(){
-  let q=supabase.from('items').select('*').order('inserted_at',{ascending:false});
-  if(typeFilter!=='all') q=q.eq('category_type',typeFilter);
-  if(categoryFilter!=='all') q=q.eq('item_category',categoryFilter);
-  if(textQuery) q=q.ilike('title',`%${textQuery}%`);
-  const { data,error }=await q;
-  const container=document.getElementById('items');
+  let q = supabase.from('items').select('*').order('inserted_at',{ascending:false});
+  if (typeFilter!=='all')   q = q.eq('category_type',typeFilter);
+  if (categoryFilter!=='all') q = q.eq('item_category',categoryFilter);
+  if (textQuery)             q = q.ilike('title',`%${textQuery}%`);
+
+  const { data, error } = await q;
+  const container = document.getElementById('items');
   container.innerHTML='';
-  if(error){container.innerHTML=`<p class='text-danger'>${error.message}</p>`;return;}
+  if (error){ container.innerHTML=`<p class='text-danger'>${error.message}</p>`; return; }
+
   data.forEach(item=>{
-    const canEdit=user.id===item.owner_id||user.user_metadata?.is_admin===true;
-    const col=document.createElement('div');
+    const canEdit = user.id===item.owner_id || user.user_metadata?.is_admin;
+    const col = document.createElement('div');
     col.className='col-12 col-sm-6 col-lg-4 col-xl-3 masonry-item';
-    const badgeColor=item.category_type==='pret'?'primary':'success';
-    const badgeLabel=item.category_type==='pret'?'Prêt':'Don';
-    const emoji=ICONS[item.item_category]||'📦';
-    col.innerHTML=`<div class='card item-card position-relative'>
-      ${item.image_url?`<img src='${item.image_url}' class='item-img' alt='${item.title}'>`:''}
-      <span class='badge bg-${badgeColor} badge-pos'>${badgeLabel}</span>
-      <div class='card-body d-flex flex-column'>
-        <h6 class='fw-semibold mb-1'><span class='cat-emoji'>${emoji}</span>${item.title}</h6>
-        <p class='text-muted small mb-1'>Villa ${item.villa ?? '?'} – ${item.username ?? 'Anonyme'}</p>
-        <p class='small flex-grow-1'>${item.description ?? ''}</p>
-        ${canEdit ? `<a href='edit.html?id=${item.id}' class='btn btn-outline-primary btn-sm mt-auto'>Modifier</a>` : ''}
-      </div>
-    </div>`;
+    const badgeColor = item.category_type==='pret' ? 'primary' : 'success';
+    const emoji = ICONS[item.item_category] || '📦';
+    col.innerHTML = `
+      <div class='card item-card position-relative'>
+        ${item.image_url?
+          `<img src='${item.image_url}' class='item-img' alt='${item.title}'>` : ''}
+        <span class='badge bg-${badgeColor} badge-pos'>
+          ${item.category_type==='pret'?'Prêt':'Don'}
+        </span>
+        <div class='card-body d-flex flex-column'>
+          <h6 class='fw-semibold mb-1'><span class='cat-emoji'>${emoji}</span>${item.title}</h6>
+          <p class='text-muted small mb-1'>Villa ${item.villa??'?'} – ${item.username??'Anonyme'}</p>
+          <p class='small flex-grow-1'>${item.description??''}</p>
+          ${canEdit?`<a href='edit.html?id=${item.id}' class='btn btn-outline-primary btn-sm mt-auto'>Modifier</a>`:''}
+        </div>
+      </div>`;
     container.appendChild(col);
   });
-  /* Masonry (re)init */
-  masonry?.destroy?.();
-  masonry = new Masonry(container,{ itemSelector: '.masonry-item', percentPosition:true });
-}
 
+  /* (re)Init Masonry */
+  masonry?.destroy?.();
+  masonry = new Masonry(container,{ itemSelector:'.masonry-item', percentPosition:true });
+
+  /* Clic image plein écran */
+  container.addEventListener('click', e=>{
+    const img = e.target.closest('.item-img');
+    if(!img) return;
+    modalImg.src = img.src;
+    bootstrap.Modal.getOrCreateInstance('#imgModal').show();
+  });
+}
+modalImg.onclick = ()=> bootstrap.Modal.getInstance('#imgModal').hide();
+
+/* première charge */
 loadItems();
 </script>
 </body>
-</html> ${item.villa??
+</html>
